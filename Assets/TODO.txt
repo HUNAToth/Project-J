@@ -1,0 +1,14 @@
+crit
+camerashake
+wallgrab kitisztázása
+walljump(megy, nem megy, powerup?)
+szövegdoboz, 
+szöveg,
+onDeath szövegdoboz
+press E to continue/close szövegdoboz
+TESZTPÁLYÁK/pályadarabok (négyzetekből)
+bolt
+többi stat (kell, nem kell)
+többi stat lefejlesztése
+új enemy
+
