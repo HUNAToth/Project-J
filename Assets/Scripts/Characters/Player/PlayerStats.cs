@@ -43,6 +43,8 @@ public class PlayerStats : CharacterStats
     }
 
 
+
+
     
     // Disable the player scripts
     public void disablePlayerScript()
@@ -131,6 +133,7 @@ public class PlayerStats : CharacterStats
     {
         return gold;
     }
+
 
 
 

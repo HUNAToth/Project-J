@@ -129,8 +129,6 @@ public class HeroKnight : MonoBehaviour {
         if(m_isWallSliding){
             Debug.Log("WallSliding");
         }
-
-
         //Death
         if (Input.GetKeyDown("e") && !m_rolling)
         {
@@ -147,6 +145,7 @@ public class HeroKnight : MonoBehaviour {
                 m_PlayerActiveWeapon.GetComponent<WeaponScript>().attackCoolDown &&
                 !m_rolling)
         {
+            Debug.Log("Attacking");
             //reduce stamina
             if(m_PlayerActiveWeapon.GetComponent<WeaponScript>().staminaCost <= 
                 GetComponent<CharacterStats>().GetCurrentStamina()){

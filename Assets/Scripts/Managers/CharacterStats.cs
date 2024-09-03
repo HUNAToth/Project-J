@@ -49,14 +49,14 @@ public class CharacterStats : MonoBehaviour
 
     [Header("Stamina")]
     public int stamina = 0;
-    public int staminaRegen = 0;
+    public int staminaRegen = 1;
     public int maxStamina = 100;
 
 
     [Header("Inventory")]
     public int gold = 0;
 
-    protected float TickTime = 0.01f;
+    protected float TickTime = 0.05f;
     protected float TickTimeDelta = 0.0f;
 
     public GameObject LastSeenEnemy;
@@ -153,7 +153,7 @@ public class CharacterStats : MonoBehaviour
         currentHealth = maxHealth;
         maxArmor = SetMaxArmorFromArmorLevel();
         currentArmor = maxArmor;
-        staminaRegen = 15;
+        staminaRegen = 1;
         XPToNextLevel = CalculateXpToNextLevel(level);
         currentHealth = maxHealth;
         currentArmor = maxArmor;
@@ -211,6 +211,9 @@ public class CharacterStats : MonoBehaviour
     {
         if (TickTimeDelta >= TickTime)
         {
+            if(staminaRegen == 0){
+                staminaRegen = 1;
+            }
             TickTimeDelta = 0f;
             if (stamina + staminaRegen <= maxStamina)
             {
@@ -461,7 +464,7 @@ public class CharacterStats : MonoBehaviour
     }
     public void DisableLevelUpParticle()
     {
-        eventLog.AddEvent(new EventLogItem("Level Up!", Time.time));
+        eventLog.AddEvent(new EventLogItem("Level Up! Press TAB to increase your stats!", Time.time));
         LevelUpParticleEmitter.SetActive(false);
 
     }
