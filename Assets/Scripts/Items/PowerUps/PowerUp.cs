@@ -26,7 +26,7 @@ public class PowerUp : MonoBehaviour
         eventLog = GameObject.Find("EventLog").GetComponent<EventLog>();
     
 
-        amount = Random.Range(level * level - level + 1, level * level);
+        amount = Random.Range(level, level * level / 2);
     }
 
     void Update()

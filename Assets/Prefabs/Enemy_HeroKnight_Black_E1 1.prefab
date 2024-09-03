@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectPrefab: {fileID: 2238460530407374202, guid: e9a68838408bf7349b263e466d63dd14, type: 3}
-  collectibleCount: 0
+  collectibleCount: 1
   canBeTriggered: 1
   destroyAfterEmit: 1
 --- !u!1 &532850237045668111
@@ -799,8 +799,10 @@ MonoBehaviour:
   attackRange: 1.5
   rangedAttackRange: 0
   selfTeam: 2
+  LevelUpParticleEmitter: {fileID: 0}
   attackDamage: 10
   attackCooldown: 3
+  defaultCritChancePct: 5
   movementSpeed: 1
   chaseSpeed: 3
   sightRange: 5
@@ -818,6 +820,7 @@ MonoBehaviour:
   lootSize: 1
   lootLevel: 1
   loot: []
+  eventLog: {fileID: 0}
 --- !u!114 &4076771961638837427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1010,7 +1013,11 @@ MonoBehaviour:
   attackDamage: 10
   attackCoolDown: 1
   staminaCost: 15
+  attackRange: 1
+  critChancePct: 10
+  critDamageMultiplier: 2
   OwnerStats: {fileID: 0}
+  eventLog: {fileID: 0}
 --- !u!61 &8780266773025796894
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -29,7 +29,7 @@ public class ObjectEmitter : MonoBehaviour
         {
             Vector3 position = transform.position;
             position.x += Random.Range(-2f, 2f);
-            position.y = -0.5f;
+            position.y = transform.position.y+2f;
             position.z += 0f;
             Instantiate(objectPrefab, position, Quaternion.identity);
         }
