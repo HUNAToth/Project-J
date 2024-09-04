@@ -395,7 +395,12 @@ public class CharacterStats : MonoBehaviour
             //fix the position of the enemy so it doesn't fall through the ground
             GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionY;
 
-            Destroy(gameObject, destroySelfTime);
+            if(tag != "Player"){
+                Destroy(gameObject, destroySelfTime);
+            }else{
+                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            }
+
 
         }
         else
