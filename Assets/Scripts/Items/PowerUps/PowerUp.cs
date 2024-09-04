@@ -48,7 +48,7 @@ public class PowerUp : MonoBehaviour
        if (Vector3.Distance(transform.position, player.transform.position) < pickUpRange)
         {
             isColliding = true;
-            Debug.Log("Colliding with player");
+            Debug.Log("PowerUp Colliding with player");
         }
     }
 
