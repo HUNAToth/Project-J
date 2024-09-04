@@ -14,6 +14,8 @@ public class HeroKnight : MonoBehaviour {
     [SerializeField] public bool m_attacking = false;
     [SerializeField] public float m_attackRange;
 
+    [SerializeField] public bool m_blocking = false;
+
     [SerializeField] public LayerMask enemyLayers ;
 
     [SerializeField] bool m_noBlood = false;
@@ -183,12 +185,15 @@ public class HeroKnight : MonoBehaviour {
         // Block
         else if (Input.GetMouseButtonDown(1) && !m_rolling )
         {
+            m_blocking = true;
             m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
         }
 
-        else if (Input.GetMouseButtonUp(1))
+        else if (Input.GetMouseButtonUp(1)){
+            m_blocking = false;
             m_animator.SetBool("IdleBlock", false);
+        }
 
         // Roll
         else if (Input.GetKeyDown("left shift") && !m_rolling && !m_isWallSliding)

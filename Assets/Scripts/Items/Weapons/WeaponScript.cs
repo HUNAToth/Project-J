@@ -25,8 +25,18 @@ public EventLog eventLog;
     void OnTriggerEnter2D(Collider2D other)
     {
         Component CharacterStats = other.gameObject.GetComponent("CharacterStats");
-        if (other.gameObject.tag=="Enemy"||other.gameObject.tag=="Player")
+        
+        if (
+            (other.gameObject.tag=="Enemy"||other.gameObject.tag=="Player")
+        )
         {
+            if(other.gameObject.tag=="Player" &&
+              other.gameObject.GetComponent<HeroKnight>().m_blocking == true){
+                
+                    return;
+            }
+
+
             int finalDamage = attackDamage + OwnerStats.GetAttackValue();
             if (Random.Range(0.0f, 100.0f) <= critChancePct+OwnerStats.GetCritChance())
             {
