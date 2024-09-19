@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class UIManager : MonoBehaviour
     public GameObject GamePlayScreen;
     public GameObject StatScreen;
     //TODO MORE SCREENS
-    public bool screenOpen = false;
+    public bool isStatScreenOpen = false;
     public GameObject player;
     public GameObject UI_HealthDisplay;
     public GameObject UI_StaminaDisplay;
@@ -62,13 +63,22 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {        
-        if(Input.GetKeyDown(KeyCode.Tab)){
-            screenOpen = !screenOpen;
-            if(screenOpen)
+        HandleStatScreenStatus();
+        HandleGamePlayScreenStats();
+        HandleStatusScreenStats();
+    }
+
+
+    private void HandleStatScreenStatus(){
+         if(Input.GetKeyDown(KeyCode.Tab)||Input.GetKeyDown(KeyCode.Escape)){
+            isStatScreenOpen = !isStatScreenOpen;
+            if(isStatScreenOpen)
             {
                 GamePlayScreen.SetActive(false);
                 StatScreen.SetActive(true);
                 ActiveScreen = StatScreen;
+                UI_HealthLevelButton = GameObject.Find("IncreaseHealthLevelBTN");
+                UI_DamageLevelButton = GameObject.Find("IncreaseDMGLevelBTN");
             }
             else
             {
@@ -76,9 +86,11 @@ public class UIManager : MonoBehaviour
                 GamePlayScreen.SetActive(true);
                 ActiveScreen = GamePlayScreen;
             }
-           
         }
-        if(ActiveScreen == GamePlayScreen){
+    }
+
+    private void HandleGamePlayScreenStats(){
+         if(ActiveScreen == GamePlayScreen){
             UpdateLevelDisplay(playerStats.GetLevel());
             UpdateFreeStatDisplay(playerStats.GetFreeStatPoints());
 
@@ -96,28 +108,21 @@ public class UIManager : MonoBehaviour
             UpdateGoldDisplay(playerStats.GetCurrentGold());
             UpdateXPDisplay(playerStats.GetCurrentXP(),
                             playerStats.GetXPToNextLevel());
-      
-        
         }
-        else if(ActiveScreen == StatScreen){
+    }
+
+    private void HandleStatusScreenStats(){
+         if(ActiveScreen == StatScreen){
             UI_FreeSkillPointDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = playerStats.GetFreeStatPoints().ToString();
            if (playerStats.GetFreeStatPoints() > 0)
             {
-                UI_HealthLevelButton.SetActive(true);
-                UI_DamageLevelButton.SetActive(true);
-               /* UI_SpeedLevelButton.SetActive(true);
-                UI_ArmorLevelButton.SetActive(true);
-                UI_PowerLevelButton.SetActive(true);
-                UI_StaminaLevelButton.SetActive(true);*/
+                UI_HealthLevelButton.GetComponent<Button>().interactable = true;
+                UI_DamageLevelButton.GetComponent<Button>().interactable = true;
             }
             else
             {
-                UI_HealthLevelButton.SetActive(false);
-                UI_DamageLevelButton.SetActive(false);
-                UI_SpeedLevelButton.SetActive(false);
-                UI_ArmorLevelButton.SetActive(false);
-                UI_PowerLevelButton.SetActive(false);
-                UI_StaminaLevelButton.SetActive(false);
+                UI_HealthLevelButton.GetComponent<Button>().interactable = false;
+                UI_DamageLevelButton.GetComponent<Button>().interactable = false;
             }
 
 
@@ -131,7 +136,16 @@ public class UIManager : MonoBehaviour
             UpdateCalculatedDMGTextDisplay(playerStats.GetDamageLevel());
 
         }
+    }
 
+    public void QuitGame()
+    {
+        if(Application.isEditor)
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
+        }else{
+            Application.Quit();
+        }
     }
 
     private void UpdateHealthDisplay(int currentHealth, int maxHealth)

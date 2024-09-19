@@ -59,6 +59,7 @@ Once the build process is complete, you can run the game by opening the generate
 | Jump / Double Jump         | `Space`  |
 | Attack        | `Left mouse click`    |
 | Block         | `Right mouse click`   |
+| Menu          | `Tab`   |
 
 
 ## 🛠️ Development
