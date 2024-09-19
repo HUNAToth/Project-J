@@ -48,10 +48,6 @@ public class UIManager : MonoBehaviour
 
     private CharacterStats playerStats;
 
-
-
-
-
     void Start()
     {
         ActiveScreen = GamePlayScreen;
@@ -62,17 +58,18 @@ public class UIManager : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {        
+    {
         HandleStatScreenStatus();
         HandleGamePlayScreenStats();
         HandleStatusScreenStats();
     }
 
-
-    private void HandleStatScreenStatus(){
-         if(Input.GetKeyDown(KeyCode.Tab)||Input.GetKeyDown(KeyCode.Escape)){
+    private void HandleStatScreenStatus()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Escape))
+        {
             isStatScreenOpen = !isStatScreenOpen;
-            if(isStatScreenOpen)
+            if (isStatScreenOpen)
             {
                 GamePlayScreen.SetActive(false);
                 StatScreen.SetActive(true);
@@ -89,142 +86,138 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void HandleGamePlayScreenStats(){
-         if(ActiveScreen == GamePlayScreen){
-            UpdateLevelDisplay(playerStats.GetLevel());
-            UpdateFreeStatDisplay(playerStats.GetFreeStatPoints());
-
-            UpdateHealthDisplay(playerStats.GetCurrentHealth(), 
-                                playerStats.GetMaxHealth()
-                                );
-            UpdateStaminaDisplay(playerStats.GetCurrentStamina(),
-                                playerStats.GetMaxStamina()
-                                );
-                                
-            UpdatePowerDisplay(playerStats.GetCurrentPower(),
-                                playerStats.GetMaxPower()
-                                );
-
-            UpdateGoldDisplay(playerStats.GetCurrentGold());
-            UpdateXPDisplay(playerStats.GetCurrentXP(),
-                            playerStats.GetXPToNextLevel());
+    private void HandleGamePlayScreenStats()
+    {
+        if (ActiveScreen == GamePlayScreen)
+        {
+            UpdateLevelDisplay();
+            UpdateFreeStatDisplay();
+            UpdateHealthDisplay();
+            UpdateStaminaDisplay();
+            UpdatePowerDisplay();
+            UpdateGoldDisplay();
+            UpdateXPDisplay();
         }
     }
 
-    private void HandleStatusScreenStats(){
-         if(ActiveScreen == StatScreen){
-            UI_FreeSkillPointDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = playerStats.GetFreeStatPoints().ToString();
-           if (playerStats.GetFreeStatPoints() > 0)
-            {
-                UI_HealthLevelButton.GetComponent<Button>().interactable = true;
-                UI_DamageLevelButton.GetComponent<Button>().interactable = true;
-            }
-            else
-            {
-                UI_HealthLevelButton.GetComponent<Button>().interactable = false;
-                UI_DamageLevelButton.GetComponent<Button>().interactable = false;
-            }
+    private void HandleStatusScreenStats()
+    {
+        if (ActiveScreen == StatScreen)
+        {
+            UpdateFreeSkillPointDisplay();
 
+            SetStatButtonIntractability();
 
-            UpdateStatDisplay(
-                //"Health_LVL",
-                playerStats.GetHealthLevel(),
-                //"Damage_LVL",
-                playerStats.GetDamageLevel()
-            );
-            UpdateCalculatedHPTextDisplay(playerStats.GetHealthLevel());
-            UpdateCalculatedDMGTextDisplay(playerStats.GetDamageLevel());
+            UpdateHealthLevelDisplay();
+            UpdateDamageLevelDisplay();
 
+            UpdateCalculatedHPTextDisplay();
+            UpdateCalculatedDMGTextDisplay();
         }
+    }
+    private void SetStatButtonIntractability()
+    {
+        bool value = playerStats.GetFreeStatPoints() > 0;
+        UI_HealthLevelButton.GetComponent<Button>().interactable = value;
+        UI_DamageLevelButton.GetComponent<Button>().interactable = value;
     }
 
     public void QuitGame()
     {
-        if(Application.isEditor)
+        if (Application.isEditor)
         {
             UnityEditor.EditorApplication.isPlaying = false;
-        }else{
+        }
+        else
+        {
             Application.Quit();
         }
     }
 
-    private void UpdateHealthDisplay(int currentHealth, int maxHealth)
+    private void SetUILabelText(GameObject label, string text)
     {
-        string healthText = currentHealth.ToString();
-        string maxHealthText = maxHealth.ToString();
-        //UI_HealthDisplay has a TextMeshProUGUI component, update the text
-        UI_HealthDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = healthText + "/" + maxHealthText;
-    }
-    private void UpdateStaminaDisplay(int currentStamina, int maxStamina)
-    {
-        string staminaText = currentStamina.ToString();
-        string maxStaminaText = maxStamina.ToString();
-        //UI_StaminaDisplay has a TextMeshProUGUI component, update the text
-        UI_StaminaDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = staminaText + "/" + maxStaminaText;
-    }
-    private void UpdatePowerDisplay(int currentPower, int maxPower)
-    {
-        string powerText = currentPower.ToString();
-        string maxPowerText = maxPower.ToString();
-        //UI_PowerDisplay has a TextMeshProUGUI component, update the text
-        UI_PowerDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = powerText + "/" + maxPowerText;
+        label.GetComponent<TMPro.TextMeshProUGUI>().text = text;
     }
 
-    private void UpdateGoldDisplay(int currentGold)
+    private void UpdateFreeSkillPointDisplay()
     {
-        string goldText = currentGold.ToString();
-        //UI_GoldDisplay has a TextMeshProUGUI component, update the text
-        UI_GoldDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = goldText;
+        SetUILabelText(UI_FreeSkillPointDisplay, playerStats.GetFreeStatPoints().ToString());
     }
 
-    private void UpdateXPDisplay(int currentXP, int XPToNextLevel)
+    private void UpdateHealthDisplay()
     {
-        string XPText = currentXP.ToString();
-        string XPToNextLevelText = XPToNextLevel.ToString();
-        UI_XPDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = XPText + "/" + XPToNextLevelText;
+        SetUILabelText(UI_HealthDisplay,
+                        playerStats.GetCurrentHealth().ToString() + "/" + playerStats.GetMaxHealth().ToString()
+        );
     }
 
-    private void UpdateLevelDisplay(int level)
+    private void UpdateStaminaDisplay()
     {
-        string levelText = level.ToString();
-        UI_LevelDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = levelText;
+        SetUILabelText(UI_StaminaDisplay,
+                        playerStats.GetCurrentStamina().ToString() + "/" + playerStats.GetMaxStamina().ToString()
+        );
+
+    }
+    private void UpdatePowerDisplay()
+    {
+        SetUILabelText(UI_PowerDisplay,
+                        playerStats.GetCurrentPower().ToString() + "/" + playerStats.GetMaxPower().ToString()
+        );
     }
 
-    private void UpdateFreeStatDisplay(int freeStatPoints)
+    private void UpdateGoldDisplay()
     {
-        string freeStatPointsText = freeStatPoints.ToString();
-        UI_FreeStatDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = freeStatPointsText;
+        SetUILabelText(UI_GoldDisplay, playerStats.GetCurrentGold().ToString());
     }
 
-    private void UpdateStatDisplay(int healthLevel, int damageLevel)
+    private void UpdateXPDisplay()
     {
-        string healthLevelText = healthLevel.ToString();
-        string damageLevelText = damageLevel.ToString();
-        UI_HealthLevelDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = healthLevelText;
-        UI_DamageLevelDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = damageLevelText;
+        SetUILabelText(UI_XPDisplay,
+            playerStats.GetCurrentXP().ToString() + "/" + playerStats.GetXPToNextLevel().ToString()
+        );
     }
 
-    private void UpdateCalculatedHPTextDisplay(int healthLevel)
-    {   
+    private void UpdateLevelDisplay()
+    {
+        SetUILabelText(UI_LevelDisplay, playerStats.GetLevel().ToString());
+    }
+
+    private void UpdateFreeStatDisplay()
+    {
+        SetUILabelText(UI_FreeStatDisplay, playerStats.GetFreeStatPoints().ToString());
+    }
+
+    private void UpdateHealthLevelDisplay()
+    {
+        SetUILabelText(UI_HealthLevelDisplay, playerStats.GetHealthLevel().ToString());
+    }
+
+    private void UpdateDamageLevelDisplay()
+    {
+        SetUILabelText(UI_DamageLevelDisplay, playerStats.GetDamageLevel().ToString());
+    }
+    private void UpdateCalculatedHPTextDisplay()
+    {
         //writes the calculated maxHP to the UI
         //in the format: "Max HP: 100 + the amount of HP from the health level"
         string calculatedHPText = playerStats.GetMaxHealth().ToString();
         calculatedHPText += " -> ";
-        calculatedHPText += playerStats.CalculateMaxHealthFromHealthLevel(healthLevel+1);
-        UI_HP_Calc_Text.GetComponent<TMPro.TextMeshProUGUI>().text = calculatedHPText;
-
+        calculatedHPText += playerStats.CalculateMaxHealthFromHealthLevel(playerStats.GetHealthLevel() + 1);
+        SetUILabelText(UI_HP_Calc_Text, calculatedHPText);
     }
-    private void UpdateCalculatedDMGTextDisplay(int damageLevel)
+    private void UpdateCalculatedDMGTextDisplay()
     {
-      //writes the calculated damage to the UI
-      //format: "Damage: "+weapon_damage+" + "+damageLevel*damage_per_level
-        string calculatedDMGText = ""+(playerStats.GetAttackValue()+playerStats.GetWeaponDamage());
+        //writes the calculated damage to the UI
+        //format: "Damage: "+weapon_damage+" + "+damageLevel*damage_per_level
+        string calculatedDMGText = "" + (playerStats.GetAttackValue() + playerStats.GetWeaponDamage());
         calculatedDMGText += " -> ";
-        calculatedDMGText += playerStats.GetAttackValueFromDamageLevel(damageLevel+1);
-        UI_Damage_Calc_Text.GetComponent<TMPro.TextMeshProUGUI>().text = calculatedDMGText;
-
+        calculatedDMGText += playerStats.GetAttackValueFromDamageLevel(playerStats.GetDamageLevel() + 1);
+        SetUILabelText(UI_Damage_Calc_Text, calculatedDMGText);
     }
 
+
+
+    //used in editor ui buttons
     public void IncreaseHealthLevel()
     {
         playerStats.IncreaseHealthLevel();
@@ -237,16 +230,17 @@ public class UIManager : MonoBehaviour
     {
         playerStats.IncreaseDexLevel();
     }
-
     public void IncreaseArmorLevel()
     {
         playerStats.IncreaseArmorLevel();
     }
-    public void IncreasePowerLevel(){
+    public void IncreasePowerLevel()
+    {
         playerStats.IncreasePowerLevel();
     }
-    public void IncreaseStaminaLevel(){
+    public void IncreaseStaminaLevel()
+    {
         playerStats.IncreaseStaminaLevel();
-    }    
+    }
 
 }
