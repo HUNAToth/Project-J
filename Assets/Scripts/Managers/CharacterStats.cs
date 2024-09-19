@@ -8,7 +8,7 @@ public class CharacterStats : MonoBehaviour
     // - General Stats - 
     [SerializeField]
     public int level = 1;
-    
+
 
     //stat to calculate max health
     public int healthLevel = 1;
@@ -132,7 +132,7 @@ public class CharacterStats : MonoBehaviour
 
     public int XPToNextLevel = 0;
 
-    
+
     public int lootSize = 1;
     public int lootLevel = 1;
 
@@ -149,7 +149,7 @@ public class CharacterStats : MonoBehaviour
     void Start()
     {
         m_animator = GetComponent<Animator>();
-        maxHealth = SetMaxHealthFromHealthLevel(healthLevel);
+        maxHealth = CalculateMaxHealthFromHealthLevel(healthLevel);
         currentHealth = maxHealth;
         maxArmor = SetMaxArmorFromArmorLevel();
         currentArmor = maxArmor;
@@ -165,23 +165,11 @@ public class CharacterStats : MonoBehaviour
         chaseSpeed += Random.Range(0.0f, 0.25f);
 
         loot = new GameObject[lootSize];
-        //TODO create a random loot BEFORE the enemy dies
-        for (int i = 0; i < lootSize; i++)
-        {
-            //create a random power up with PowerUpFactory 
-            //and add it to the loot 
-           // loot[i] = PowerUpFactory.CreateRandomPowerUp(lootLevel);
-        }
-
     }
 
 
-    private int SetMaxHealthFromHealthLevel(int _healthLevel)
-    {
-        maxHealth = CalculateMaxHealthFromHealthLevel(_healthLevel);
-        return maxHealth;
-    }
-    public  int CalculateMaxHealthFromHealthLevel(int _healthLevel)
+
+    public int CalculateMaxHealthFromHealthLevel(int _healthLevel)
     {
         int TmpMaxHealth = _healthLevel * healthIncreasePerLevel + level;
         return TmpMaxHealth;
@@ -198,37 +186,28 @@ public class CharacterStats : MonoBehaviour
         if (isDead)
         {
             Blink();
-        }else
+        }
+        else
         {
             XPToNextLevel = CalculateXpToNextLevel(level);
             TickTimeDelta += Time.deltaTime;
             RegenStamina();
         }
-   
+
     }
 
     public void RegenStamina()
     {
-        if (TickTimeDelta >= TickTime)
-        {
-            if(staminaRegen == 0){
-                staminaRegen = 1;
-            }
-            TickTimeDelta = 0f;
-            if (stamina + staminaRegen <= maxStamina)
-            {
-                stamina += staminaRegen;
-            }
-            else
-            {
-                stamina = maxStamina;
-            }
-        }
+        if (TickTimeDelta < TickTime) return;
+
+        staminaRegen = staminaRegen == 0 ? 1 : staminaRegen;
+        TickTimeDelta = 0f;
+        stamina = (stamina + staminaRegen <= maxStamina) ? stamina + staminaRegen : maxStamina;
     }
 
 
-        // Set the last seen enemy
-        public void SetLastSeenEnemy(GameObject enemy)
+    // Set the last seen enemy
+    public void SetLastSeenEnemy(GameObject enemy)
     {
         LastSeenEnemy = enemy;
     }
@@ -241,7 +220,7 @@ public class CharacterStats : MonoBehaviour
 
     /**********************************************************************************************/
     // - Health -
-    
+
     // Get the max health of the character
     public int GetMaxHealth()
     {
@@ -253,11 +232,9 @@ public class CharacterStats : MonoBehaviour
         currentHealth = newCurrent;
     }
 
-    public void IncreaseHealth(int amount){
-        currentHealth += amount;
-        if(currentHealth > maxHealth){
-            currentHealth = maxHealth;
-        }
+    public void IncreaseHealth(int amount)
+    {
+        currentHealth = (currentHealth + amount <= maxHealth) ? currentHealth + amount : maxHealth;
     }
     // Get current health of the character
     public int GetCurrentHealth()
@@ -270,12 +247,12 @@ public class CharacterStats : MonoBehaviour
         return healthLevel;
     }
     // Get the isDead the character
-      public bool GetIsDead()
+    public bool GetIsDead()
     {
         return isDead;
     }
     // Set the isDead the character
-      public void SetIsDead(bool _isDead)
+    public void SetIsDead(bool _isDead)
     {
         isDead = _isDead;
     }
@@ -325,7 +302,8 @@ public class CharacterStats : MonoBehaviour
     {
         currentPower += _power;
     }
-    public int GetMaxPower(){
+    public int GetMaxPower()
+    {
         return maxPower;
     }
     /**********************************************************************************************/
@@ -345,7 +323,7 @@ public class CharacterStats : MonoBehaviour
 
     public int GetCurrentXP()
     {
-        return  XP;
+        return XP;
     }
     public int GetXPToNextLevel()
     {
@@ -355,7 +333,7 @@ public class CharacterStats : MonoBehaviour
     public int GetLevel()
     {
         return level;
-    }   
+    }
 
     public int GetFreeStatPoints()
     {
@@ -363,107 +341,117 @@ public class CharacterStats : MonoBehaviour
     }
 
     // Take damage and logic for armor
-    // if armor is 100% then first damage decrease armor by 20%
     // if armor is 0% then damage goes directly to health
     public void TakeDamage(int damage)
     {
-
         m_animator.SetTrigger("Hurt");
 
-        if(currentArmor >= damage){
+        //handle armor damage first
+        if (currentArmor >= damage)
+        {
             currentArmor -= damage;
-        }else{
+        }
+        else
+        {
             currentHealth -= damage - currentArmor;
             currentArmor = 0;
         }
 
-        if(tag != "Player"){
-            healthBar.SetHealthBar(maxHealth, currentHealth);
-            healthBar.SetArmorBar(maxArmor, currentArmor);
-            GetComponent<NPCBehaviour>().DisplayPopUpText(damage,"damage");
-        }   
+        HandleEnemyUIStats(damage);
 
-        // animatorHandler.PlayTargetAnimation("Damage01",true);
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
-            isDead = true;
-            m_animator.SetTrigger("Death");
-            
-            //disable the collider so the player can walk over the enemy
-            GetComponent<CapsuleCollider2D>().enabled = false;
-            //fix the position of the enemy so it doesn't fall through the ground
-            GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionY;
+            HandleCharacterDeath();
+        }
+    }
 
-            if(tag != "Player"){
-                Destroy(gameObject, destroySelfTime);
-            }else{
-                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
-            }
+    private void HandleCharacterDeath()
+    {
+        currentHealth = 0;
+        isDead = true;
+        m_animator.SetTrigger("Death");
 
+        //disable the collider so the player can walk over the enemy
+        GetComponent<CapsuleCollider2D>().enabled = false;
+        //fix the position of the enemy so it doesn't fall through the ground
+        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionY;
 
+        if (tag == "Player")
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
         }
         else
         {
-            // get the player and play the damage sound
-            /*      player
-                      .GetComponent<PlayerMovementScript>()
-                      .PlayDamageSound();*/
+            Destroy(gameObject, destroySelfTime);
         }
-
     }
 
+
+
+    private void HandleEnemyUIStats(int damage)
+    {
+        if (tag != "Player")
+        {
+            healthBar.SetHealthBar(maxHealth, currentHealth);
+            healthBar.SetArmorBar(maxArmor, currentArmor);
+            GetComponent<NPCBehaviour>().DisplayPopUpText(damage, "damage");
+        }
+    }
 
     //while the enemy is dead but still visible, the enemy sprite is blinking 
     private void Blink()
     {
         blinkDelta += Time.deltaTime;
 
-        if (isDead && blinkDelta >= blinkDeltaTime)
+        if (!isDead || blinkDelta <= blinkDeltaTime) return;
+
+        if (isVisible)
         {
-            if (isVisible)
-            {
-                GetComponent<SpriteRenderer>().enabled = false;
-                isVisible = false;
-                blinkDeltaTime -= 0.03f;
-            }
-            else
-            {
-                GetComponent<SpriteRenderer>().enabled = true;
-                isVisible = true;
-            }
-
-            blinkDelta = 0.0f;
-
+            GetComponent<SpriteRenderer>().enabled = false;
+            isVisible = false;
+            blinkDeltaTime -= 0.03f;
         }
+        else
+        {
+            GetComponent<SpriteRenderer>().enabled = true;
+            isVisible = true;
+        }
+
+        blinkDelta = 0.0f;
+
     }
 
-    public int  CalculateXpToNextLevel(int _level)
+    public int CalculateXpToNextLevel(int _level)
     {
-        return  _level * _level + _level;
+        return _level * _level + _level;
     }
 
     public void IncreaseExperience(int amount)
     {
         XP += amount;
-        if(XP >= XPToNextLevel){
-            int tempXP = XP;
-            while(tempXP >= XPToNextLevel){
-                tempXP -= XPToNextLevel;
-                XP -= XPToNextLevel;
-                IncreaseLevel();
-            }
+        if (XP < XPToNextLevel) return;
+
+        int tempXP = XP;
+        while (tempXP >= XPToNextLevel)
+        {
+            tempXP -= XPToNextLevel;
+            XP -= XPToNextLevel;
+            IncreaseLevel();
         }
     }
 
-    public void IncreaseLevel(){
-        level+=1;
+    public void IncreaseLevel()
+    {
+        level += 1;
         XPToNextLevel = CalculateXpToNextLevel(level);
-        SetMaxHealthFromHealthLevel(healthLevel);
+
+        maxHealth = CalculateMaxHealthFromHealthLevel(healthLevel);
+
         IncreaseFreeStatPoints();
 
         //play level up animation (enable particle emitter)
         //Get LevelUpParticleEmitter by name
+
         LevelUpParticleEmitter.SetActive(true);
         Invoke("DisableLevelUpParticle", 1.0f);
     }
@@ -474,8 +462,9 @@ public class CharacterStats : MonoBehaviour
 
     }
 
-    public void IncreaseFreeStatPoints(){
-        freeStatPoints+=1;
+    public void IncreaseFreeStatPoints()
+    {
+        freeStatPoints += 1;
     }
 
     public int GetWeaponDamage()
@@ -484,51 +473,60 @@ public class CharacterStats : MonoBehaviour
         return GetComponent<HeroKnight>().m_PlayerActiveWeapon.GetComponent<WeaponScript>().attackDamage;
     }
 
-    public int GetAttackValue(){
+    public int GetAttackValue()
+    {
         //returns weapon_damage + damageLevel*damage_per_level
-        return damageLevel * damageIncreasePerLevel+level;
+        return damageLevel * damageIncreasePerLevel + level;
     }
 
-    public int GetAttackValueFromDamageLevel(int _damageLevel){
+    public int GetAttackValueFromDamageLevel(int _damageLevel)
+    {
         //returns weapon_damage + damageLevel*damage_per_level
-        return GetWeaponDamage() + _damageLevel * damageIncreasePerLevel+level;
+        return GetWeaponDamage() + _damageLevel * damageIncreasePerLevel + level;
     }
 
-    public float GetCritChance(){
+    public float GetCritChance()
+    {
         return defaultCritChancePct;
     }
 
 
-// - Stats -
+    // - Stats -
     public void IncreaseHealthLevel()
     {
         healthLevel++;
-        maxHealth = SetMaxHealthFromHealthLevel(healthLevel);
+        maxHealth = CalculateMaxHealthFromHealthLevel(healthLevel);
         currentHealth = maxHealth;
         DecreaseFreeStatPoints();
     }
-    public void DecreaseFreeStatPoints(){
-        if(freeStatPoints > 0){
-            freeStatPoints-=1;
+    public void DecreaseFreeStatPoints()
+    {
+        if (freeStatPoints > 0)
+        {
+            freeStatPoints -= 1;
         }
     }
-    public void IncreasePowerLevel(){
+    public void IncreasePowerLevel()
+    {
         powerLevel++;
         currentPower = maxPower;
         DecreaseFreeStatPoints();
     }
-    public void IncreaseStaminaLevel(){
+    public void IncreaseStaminaLevel()
+    {
         staminaLevel++;
         stamina = maxStamina;
         DecreaseFreeStatPoints();
     }
-    public void IncreaseDamageLevel(){
+    public void IncreaseDamageLevel()
+    {
         damageLevel++;
         attackDamage = damageLevel * 10;
         DecreaseFreeStatPoints();
     }
     //TODO create speed stat(movement speed, attack speed, attack range etc )
-    public void IncreaseDexLevel(){
+    public void IncreaseDexLevel()
+    {
         dexLevel++;
         movementSpeed = dexLevel * 0.5f;
         DecreaseFreeStatPoints();
@@ -536,11 +534,12 @@ public class CharacterStats : MonoBehaviour
         //attackRange = dexLevel * 0.5f;
         //attackCooldown = dexLevel * 0.5f;
     }
-    public void IncreaseArmorLevel(){
+    public void IncreaseArmorLevel()
+    {
         armorLevel++;
         maxArmor = SetMaxArmorFromArmorLevel();
         DecreaseFreeStatPoints();
-        
+
     }
 
 

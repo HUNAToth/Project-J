@@ -9,19 +9,20 @@ public class PlayerStats : CharacterStats
     private int playerLevel = 1;
     private int playerExperience = 0;
 
-    
+
 
     // - Initial - //
     /**********************************************************************************************/
     // Start is called before the first frame update
     // set the max health of the player and the current health of the player
-    void Awake(){
+    void Awake()
+    {
         player = GameObject.Find("Player");
     }
 
     void Start()
     {
-        maxHealth = SetMaxHealthFromHealthLevel();
+        maxHealth = healthLevel * 10;
         currentHealth = maxHealth;
         stamina = maxStamina;
     }
@@ -30,12 +31,6 @@ public class PlayerStats : CharacterStats
 
     // - Health - //
     /**********************************************************************************************/
-    private int SetMaxHealthFromHealthLevel()
-    {
-        maxHealth = healthLevel * 10;
-        return maxHealth;
-    }
-
     // Check the player is can pickup the health item
     public bool CanPickupHealthItem(int PointsRestored)
     {
@@ -45,30 +40,30 @@ public class PlayerStats : CharacterStats
 
 
 
-    
+
     // Disable the player scripts
     public void disablePlayerScript()
     {
-       /* player.GetComponent<GunInventory>().enabled = false;
-        player
-            .GetComponent<GunInventory>()
-            .currentGun
-            .GetComponent<GunScript>()
-            .enabled = false;
-        player.GetComponent<PlayerMovementScript>().enabled = false;*/
+        /* player.GetComponent<GunInventory>().enabled = false;
+         player
+             .GetComponent<GunInventory>()
+             .currentGun
+             .GetComponent<GunScript>()
+             .enabled = false;
+         player.GetComponent<PlayerMovementScript>().enabled = false;*/
     }
 
     //Enable the player scripts
     public void enablePlayerScript()
     {
-    /*    player.GetComponent<GunInventory>().enabled = true;
-        player
-            .GetComponent<GunInventory>()
-            .currentGun
-            .GetComponent<GunScript>()
-            .enabled = true;
-        player.GetComponent<PlayerMovementScript>().enabled = true;*/
- 
+        /*    player.GetComponent<GunInventory>().enabled = true;
+            player
+                .GetComponent<GunInventory>()
+                .currentGun
+                .GetComponent<GunScript>()
+                .enabled = true;
+            player.GetComponent<PlayerMovementScript>().enabled = true;*/
+
     }
 
     // - Armor - //
