@@ -69,21 +69,14 @@ public class UIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Escape))
         {
             isStatScreenOpen = !isStatScreenOpen;
-            if (isStatScreenOpen)
-            {
-                GamePlayScreen.SetActive(false);
-                StatScreen.SetActive(true);
-                ActiveScreen = StatScreen;
-                UI_HealthLevelButton = GameObject.Find("IncreaseHealthLevelBTN");
-                UI_DamageLevelButton = GameObject.Find("IncreaseDMGLevelBTN");
-            }
-            else
-            {
-                StatScreen.SetActive(false);
-                GamePlayScreen.SetActive(true);
-                ActiveScreen = GamePlayScreen;
-            }
+            HandleStatScreenOpening();
         }
+    }
+
+    public void HandleTabPress()
+    {
+        isStatScreenOpen = !isStatScreenOpen;
+        HandleStatScreenOpening();
     }
 
     private void HandleGamePlayScreenStats()
@@ -115,6 +108,25 @@ public class UIManager : MonoBehaviour
             UpdateCalculatedDMGTextDisplay();
         }
     }
+
+    public void HandleStatScreenOpening()
+    {
+        if (isStatScreenOpen)
+        {
+            GamePlayScreen.SetActive(false);
+            StatScreen.SetActive(true);
+            ActiveScreen = StatScreen;
+            UI_HealthLevelButton = GameObject.Find("IncreaseHealthLevelBTN");
+            UI_DamageLevelButton = GameObject.Find("IncreaseDMGLevelBTN");
+        }
+        else
+        {
+            StatScreen.SetActive(false);
+            GamePlayScreen.SetActive(true);
+            ActiveScreen = GamePlayScreen;
+        }
+    }
+
     private void SetStatButtonIntractability()
     {
         bool value = playerStats.GetFreeStatPoints() > 0;

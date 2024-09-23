@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class HeroKnight : MonoBehaviour
 {
@@ -26,6 +28,8 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] public GameObject[] m_PlayerWeapons;
 
     private Animator m_animator;
+
+    public UIManager uiManager;
     private Rigidbody2D m_body2d;
     private Sensor_HeroKnight m_groundSensor;
     private Sensor_HeroKnight m_wallSensorR1;
@@ -60,12 +64,20 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
         enemyLayers = LayerMask.GetMask("Enemy");
+        uiManager = GameObject.Find("UI").GetComponent<UIManager>();
+
     }
 
     // Update is called once per frame
 
     void Update()
     {
+        //do not allow movement if the game is not in the gameplay screen
+        if (uiManager.ActiveScreen != uiManager.GamePlayScreen)
+        {
+            return;
+        }
+
         // Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
