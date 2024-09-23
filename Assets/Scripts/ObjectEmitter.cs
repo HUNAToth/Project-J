@@ -15,7 +15,7 @@ public class ObjectEmitter : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-       // Debug.Log("Emitter started: " + objectPrefab.name);
+
     }
 
     /*function that when called, 
@@ -29,7 +29,7 @@ public class ObjectEmitter : MonoBehaviour
         {
             Vector3 position = transform.position;
             position.x += Random.Range(-2f, 2f);
-            position.y = transform.position.y+2f;
+            position.y = transform.position.y + 2f;
             position.z += 0f;
             Instantiate(objectPrefab, position, Quaternion.identity);
         }
@@ -41,16 +41,16 @@ public class ObjectEmitter : MonoBehaviour
             Destroy(transform.parent.gameObject);
         }
     }
-/*
-    private void OnTriggerEnter(Collider other)
-    {
-        if (canBeTriggered)
+    /*
+        private void OnTriggerEnter(Collider other)
         {
-            if (!other.gameObject.CompareTag("Weapon")) return;
-            Emit();
+            if (canBeTriggered)
+            {
+                if (!other.gameObject.CompareTag("Weapon")) return;
+                Emit();
+            }
         }
-    }
-*/
+    */
     // Update is called once per frame
     void Update()
     {
